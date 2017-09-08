@@ -1,2 +1,2 @@
 # Trust-List
-Trust list using blockchains
+Trust list using blockchains for securing IoT data transfers. 

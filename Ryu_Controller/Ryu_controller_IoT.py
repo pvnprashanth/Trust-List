@@ -84,19 +84,6 @@ logging.basicConfig()
 
 #global variables
 start_time = 0.0
-"""sent_time1=0.0
-sent_time2=0.0
-sent_time3=0.0
-sent_timelink=0.0
-received_time1 = 0.0
-received_time2 = 0.0
-src_dpid=0
-dst_dpid=0
-src_hwr=0
-dst_hwr=0
-mytimer = 0
-OWD1=0.0
-OWD2=0.0"""
 switch_links = {}
 flag=0
 t=0
@@ -114,13 +101,6 @@ mac_json = {}
 
 server_gateway = "2-1"
 iot_range = ('10.0.0.1', '10.0.0.2')
-
-#apps_json2 = {u'Smart_Building': {'appIPaddr': u'192.168.0.1', 'appPort': u'34567', 'appURL': u'http://www.smartbuilding.com', 'appProtocol': u'tcp', 'appName': u'Smart_Building'}, u'Smart_Home': {'appIPaddr': u'192.168.0.1', 'appPort': u'2004', 'appURL': u'http://www.smarthome.com', 'appProtocol': u'tcp', 'appName': u'Smart_Home'}, u'Theft_Detection': {'appIPaddr': u'192.168.0.1', 'appPort': u'39493', 'appURL': u'http://www.theftdetectionm.com', 'appProtocol': u'tcp', 'appName': u'Theft_Detection'}, u'Home_Automation': {'appIPaddr': u'192.168.0.1', 'appPort': u'43950', 'appURL': u'http://www.homeautomation.com', 'appProtocol': u'udp', 'appName': u'Home_Automation'}, u'Smart_City': {'appIPaddr': u'192.168.0.1', 'appPort': u'56987', 'appURL': u'http://www.smartcity.com', 'appProtocol': u'tcp', 'appName': u'Smart_City'}, u'Smart_Voting': {'appIPaddr': u'192.168.0.1', 'appPort': u'22100', 'appURL': u'http://www.smartvoting.com', 'appProtocol': u'tcp', 'appName': u'Smart_Voting'}, u'Garbage_Monitoring_System': {'appIPaddr': u'192.168.0.1', 'appPort': u'19003', 'appURL': u'http://www.garbagemonitoringsystem.com', 'appProtocol': u'tcp', 'appName': u'Garbage_Monitoring_System'}}
-'''apps_json2 = {u'Smart_Home': {'appIPaddr': u'192.168.0.1', 'appPort': u'2004', 'appURL': u'http://www.smarthome.com', 'appProtocol': u'tcp', 'appName': u'Smart_Home'}}
-ports2 = [u'tcp-34567', u'tcp-2004', u'tcp-39493', u'udp-43950', u'tcp-56987', u'tcp-22100', u'tcp-19003']
-
-devices_json2 = {u'1e:6c:f7:5e:ba:e7': {'IP': u'10.0.0.1 ', 'MAC': u'1e:6c:f7:5e:ba:e7', 'myApps': u'Smart_Building,'}}'''
-
 
 apps_json2 = {u'Smart_Home': {'appIPaddr': u'192.168.0.1', 'appPort': u'2004', 'appURL': u'http://www.smarthome.com', 'appProtocol': u'tcp', 'appName': u'Smart_Home'}}
 ports2 = [u'tcp-34567', u'tcp-2004', u'tcp-39493', u'udp-43950', u'tcp-56987', u'tcp-22100', u'tcp-19003']
@@ -307,41 +287,8 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
         self.i=0
         wsgi = kwargs['wsgi']
         wsgi.register(SimpleSwitchController, {media_stats_name : self})
-        #wsgi.register(GUIServerController)    
-        #self._snoop = kwargs['igmplib']------------------
-        # if you want a switch to operate as a querier,
-        # set up as follows:
-        #self._snoop.set_querier_mode(dpid=1, server_port=3)-------------------
-        #self._snoop.set_querier_mode(dpid=str_to_dpid('0000000000000001'), server_port=2)
-        #self.stp = kwargs['stplib']
-        # Sample of stplib config.
-        #  please refer to stplib.Stp.set_config() for details.
-        """config = {dpid_lib.str_to_dpid('0000000000000001'):
-                     {'bridge': {'priority': 0x8000}},
-                  dpid_lib.str_to_dpid('0000000000000002'):
-                     {'bridge': {'priority': 0x9000}}}
-        self.stp.set_config(config)"""   
-        #self.dpset = kwargs['dpset'] 
-        #self.create_graph()
-        # dpid         the datapath id that will operate as a querier.
-        # server_port  a port number which connect to the multicast
-        #              server.
-        #
-        # NOTE: you can set up only the one querier.
-        # when you called this method several times,
-        # only the last one becomes effective.
         self.timestamp=0
         self.datapaths = {}
-        #global start_time
-        #start_time = time.time() * 1000
-        #print "start_time:", start_time
-        '''for key in apps_json2:
-            IP_address = apps_json2[key]['appIPaddr']
-            protocol = apps_json2[key]['appProtocol']
-            port_no = apps_json2[key]['appPort']
-            print 'IP_address', IP_address
-            print 'protocol', protocol
-            print 'port_no', port_no'''
         self.monitor_thread = hub.spawn(self._monitor)
 
 
@@ -350,26 +297,7 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
     def _monitor(self):
         global switch_links, destination, apps_json, ports
         hub.sleep(10)
-        '''while True:
-
-            for key in devices_json2:
-                src_mac = key
-                scr_ip = devices_json2[key]['IP']
-                myapps1 = devices_json2[key]['myApps'].split(",")
-                print myapps1
-                
-                for i in range(0, len(myapps1)-1, 1):
-                    if myapps1[i] in apps_json2:
-                        dst_ip = apps_json2[myapps1[i]]['appIPaddr']
-                        dst_port = apps_json2[myapps1[i]]['appPort']
-                        proto = apps_json2[myapps1[i]]['appProtocol']
-                        print 'src_mac, scr_ip, dst_ip, dst_port, proto', src_mac, scr_ip, dst_ip, dst_port, proto 
-                        source1 = '1-1'
-                        dest1 = '2-1'
-                        self.create_graph_permanent(source1, dest1, src_mac, scr_ip, dst_ip, dst_port, proto)
-
-            hub.sleep(10)'''
-         
+                 
         while True:
             #print(switch_links)
             file = open("pri_flrule.txt","a")
@@ -383,10 +311,7 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
             #psn = web3.personal.Personal(obj)
             web3.personal.unlockAccount(web3.eth.accounts[0],"prashanth",1000) #replace 123456 to your Ethereum accounts password
 
-            #abi = [{u'inputs': [], u'constant': True, u'name': u'getAllIOT_Devices', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'registerNewApp1', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'removeApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'addAppToUser', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'constant': True, u'name': u'getAllApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': False, u'name': u'removeIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': True, u'name': u'getAppDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'data1'}], u'constant': False, u'name': u'registerNewIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'IP'}, {u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'registerNewIOT_Device1', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'registerNewApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'type': u'constructor', u'payable': True}]
-
-            #contract_address = '0x1614f85a270c1454ffa6f035f03fdd16df428294'
-
+ 
             abi = [{u'inputs': [], u'constant': True, u'name': u'getAllIOT_Devices', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'removeApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'IP'}, {u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'registerNewIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'addAppToUser', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'constant': True, u'name': u'getAllApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': False, u'name': u'removeIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': True, u'name': u'getAppDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'registerNewApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'type': u'constructor', u'payable': True}]
 
 #[{u'inputs': [], u'constant': True, u'name': u'getAllIOT_Devices', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'removeApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'IP'}, {u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appName'}], u'constant': False, u'name': u'registerNewIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}, {u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'addAppToUser', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': True, u'name': u'getIOT_DeviceApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'constant': True, u'name': u'getAllApps', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'MAC'}], u'constant': False, u'name': u'removeIOT_Device', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appName'}], u'constant': True, u'name': u'getAppDetails', u'outputs': [{u'type': u'string', u'name': u''}], u'payable': False, u'type': u'function'}, {u'inputs': [{u'type': u'string', u'name': u'appIPaddr'}, {u'type': u'string', u'name': u'appName'}, {u'type': u'string', u'name': u'appURL'}, {u'type': u'string', u'name': u'appProtocol'}, {u'type': u'string', u'name': u'appPort'}], u'constant': False, u'name': u'registerNewApp', u'outputs': [{u'type': u'bool', u'name': u'success'}], u'payable': False, u'type': u'function'}, {u'inputs': [], u'type': u'constructor', u'payable': True}]
@@ -465,10 +390,7 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
                 #print(datetime.datetime.fromtimestamp(int(start_time)).strftime('%Y-%m-%d %H:%M:%S'))
                 #file.write(start_time)   
             ports = ports1
-            #print 'printing white list'
-            #print ports1
-            #print apps_json
-            #print devices_json
+
 
             for key in devices_json:
                 src_mac = key
@@ -494,18 +416,6 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
 
 
 
-
-    """@set_ev_cls(event.EventSwitchEnter)
-    def _event_switch_enter_handler(self, ev):
-        msg = ev.switch.to_dict()
-        print "_event_switch_enter_handler msg: ", msg
-        print "_event_switch_enter_handler ev.switch.dp.address, ev.switch.dp.id: ", ev.switch.dp.address, ev.switch.dp.id
-        for sw in api.get_all_switch(self):
-            print "sw.dp.socket.getpeername(), sw.dp.id: ", sw.dp.socket.getpeername(), sw.dp.id
-
-
-        #self._rpc_broadcall('event_switch_enter', msg)"""
-
     @set_ev_cls(event.EventSwitchLeave)
     def _event_switch_leave_handler(self, ev):
         msg = ev.switch.to_dict()
@@ -515,47 +425,11 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
     @set_ev_cls(event.EventLinkAdd)
     def _event_link_add_handler(self, ev):
         global switch_links
-        #msg = ev.link.to_dict()
-        #print "_event_link_add_handler msg: ", msg
-        #print "_event_link_add_handler msg.keys(): ", msg.keys()
-        #print "_event_link_add_handler msg.values(): ", msg.values()
-        #print "_event_link_add_handler ev.switch.dp.address: ", ev.switch.dp.address
-        #print "msg.get('src').get('name'), msg.get('dst').get('name'): ", msg.get('src').get('name'), msg.get('dst').get('name')
-        #print "msg.get('src').get('hw_addr'), msg.get('dst').get('hw_addr'): ", msg.get('src').get('hw_addr'), msg.get('dst').get('hw_addr')
-
-        """link_src = msg.get('src').get('name').strip()
-        link_dst = msg.get('dst').get('name').strip()
-
-        dpid_src = str(int(msg.get('src').get('dpid'))).strip()
-        port_no_src = str(int(msg.get('src').get('port_no'))).strip()
-        hw_addr_src = msg.get('src').get('hw_addr').strip()
-
-        dpid_dst = str(int(msg.get('dst').get('dpid'))).strip()
-        port_no_dst = str(int(msg.get('dst').get('port_no'))).strip()  
-        hw_addr_dst = msg.get('dst').get('hw_addr').strip()"""
-
-        #key1.replace("'", "")
-        #key1 = key1[1:]
-        #key1 = key1[key1.index("'")+1:key1.rindex("'")]
-        #print "key1: ", key1
-        #key = (link_src + "," + link_dst)
-        #key_rev = (link_dst + "," + link_src)
-        #print "key : ", key
-        #value = (dpid_src + "," + port_no_src + "," + hw_addr_src + "," + dpid_dst + "," + port_no_dst + "," + hw_addr_dst)
-        #value = (dpid_src + "," + port_no_src + "," + hw_addr_src + "," + dpid_dst + "," + port_no_dst + "," + hw_addr_dst + "," + "" + "," + "" + "," + "" + "," + "" + "," + "" + "," + "")
-        #print "value : ", value
-        """if key not in switch_links and key_rev not in switch_links:
-            switch_links[key] = []
-            switch_links[key].append(value)"""
-        #print "_event_link_add_handler: ", ev.link.src, ev.link.dst
-        #print self._get_hwaddr(ev.link.src.dpid, ev.link.src.port_no)
-        #self._rpc_broadcall('event_link_add', msg)
+        
 
     @set_ev_cls(event.EventLinkDelete)
     def _event_link_delete_handler(self, ev):
         msg = ev.link.to_dict()
-        #print "_event_link_delete_handler msg: ", msg
-        #self._rpc_broadcall('event_link_delete', msg)
 
     @set_ev_cls(event.EventHostAdd)
     def _event_host_add_handler(self, ev):
@@ -773,66 +647,9 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
                         src_ip = p.src 
                         dst_ip = p.dst
                         print 'IP packet:', p
-                        '''if p.protocol_name == 'tcp':
-                            #if src_ip != '' and dst_ip != '':
-                            testip = str(src_ip)
-                            v = self.check_ipv4_in(testip, *iot_range)
-                            if v:
-                                print 'TCP packet:', p
-                                #print 'source port = ', p.src_port
-                                #print 'destination port = ', p.dst_port
-                                src_port = p.src_port
-                                dst_port = p.dst_port 
-                                proto = 'tcp'
-                                for key in apps_json2:
-                                    IP_address = apps_json2[key]['appIPaddr']
-                                    protocol = apps_json2[key]['appProtocol']
-                                    port_no = apps_json2[key]['appPort']
-                                    print 'white List - appProtocol, appIPaddr, appPort', protocol, IP_address, port_no
-                                    print 'IOT device packet details - src_ip, dst_ip, dst_port, proto', src_ip, dst_ip, dst_port, proto                   
-                                    print IP_address == dst_ip
-                                    print protocol == proto
-                                    print port_no == str(dst_port)
-                                    #self.create_graph_temporary(source1, dest1, src_ip, dst_ip, src_port, dst_port, proto)
-                                    if (IP_address == dst_ip and protocol == proto and port_no == str(dst_port)):
-                                        self.create_graph_temporary(source1, dest1, src_ip, dst_ip, src_port, dst_port, proto)
-
-
-                        if p.protocol_name == 'udp':
-                            #if src_ip != '' and dst_ip != '':
-                            testip = str(src_ip)
-                            v = self.check_ipv4_in(testip, *iot_range)
-                            if v:            
-                                print 'UDP packet:', p
-                                print 'source port = ', p.src_port
-                                print 'destination port = ', p.dst_port
-                                src_port = p.src_port
-                                dst_port = p.dst_port 
-                                proto = 'udp'
-                                for key in apps_json2:
-                                    IP_address = apps_json2[key]['appIPaddr']
-                                    protocol = apps_json2[key]['appProtocol']
-                                    port_no = apps_json2[key]['appPort']
-                                    print 'white List - appProtocol, appIPaddr, appPort', protocol, IP_address, port_no
-                                    print 'IOT device packet details - src_ip, dst_ip, dst_port, proto', src_ip, dst_ip, dst_port, proto
-                                    #self.create_graph_temporary(source1, dest1, src_ip, dst_ip, src_port, dst_port, proto)
-                                    if (IP_address == dst_ip and protocol == proto and port_no == str(dst_port)):
-                                        self.create_graph_temporary(source1, dest1, src_ip, dst_ip, src_port, dst_port, proto)'''
-
-
-
-
 
                  
                 if p.protocol_name == 'arp':
-                    #print p.protocol_name, p
-                    #print 'source MAC = ', p.src_mac
-                    #print 'source IP = ', p.src_ip
-                    #print 'destination IP = ', p.dst_ip
-                    #print 'arp opcode = ' , p.opcode
-                    #print 'p.src_ip, p.dst_ip', p.src_ip, p.dst_ip
-                    #if src_ip != '' and dst_ip != '':
-                    #print 'p.src_ip1, p.dst_ip1', p.src_ip, p.dst_ip
                     testip = str(p.src_ip)
                     v = self.check_ipv4_in(testip, *iot_range)  
                     if v:
@@ -990,39 +807,6 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
             if datapath.id in self.datapaths:
                 self.logger.debug('unregister datapath: %016x', datapath.id)
                 del self.datapaths[datapath.id]
-                #print "_state_change_handler DEAD_DISPATCHER datapath: ", datapath
-                #print "_state_change_handler DEAD_DISPATCHER datapath.id: ", datapath.id
-        """for dp in self.datapaths.values():
-            print "dp.id: ", dp.id"""
-
-    """@set_ev_cls(stplib.EventTopologyChange, MAIN_DISPATCHER)
-    def _topology_change_handler(self, ev):
-        dp = ev.dp
-        dpid_str = dpid_lib.dpid_to_str(dp.id)
-        msg = 'Receive topology change event. Flush MAC table.'
-        self.logger.debug("[dpid=%s] %s", dpid_str, msg)
-
-        if dp.id in self.mac_to_port:
-            self.delete_flow(dp)
-            del self.mac_to_port[dp.id]
-
-    @set_ev_cls(stplib.EventPortStateChange, MAIN_DISPATCHER)
-    def _port_state_change_handler(self, ev):
-        dpid_str = dpid_lib.dpid_to_str(ev.dp.id)
-        global flag
-        of_state = {stplib.PORT_STATE_DISABLE: 'DISABLE',
-                    stplib.PORT_STATE_BLOCK: 'BLOCK',
-                    stplib.PORT_STATE_LISTEN: 'LISTEN',
-                    stplib.PORT_STATE_LEARN: 'LEARN',
-                    stplib.PORT_STATE_FORWARD: 'FORWARD'}
-        self.logger.debug("[dpid=%s][port=%d] state=%s",
-                          dpid_str, ev.port_no, of_state[ev.port_state])
-        print "ev.port_state, flag: ", ev.port_state, flag 
-        if all( [ev.port_state == 4, flag == 0] ): 
-            print "INSIDE ***###: ",    
-            monitor_thread = hub.spawn(self._monitor)
-            flag = 1"""    
-
 
 
 
@@ -1059,36 +843,15 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
 		match = parser.OFPMatch(eth_type=ether.ETH_TYPE_IP, ipv4_src=('10.0.0.0', '255.255.255.0'), ip_proto=6)
         #match = parser.OFPMatch(eth_type=ether.ETH_TYPE_IP, in_port=in_port,  ipv4_src=source_IP, ipv4_dst=dest_IP, ip_proto=6)
         	priority = 1
-       		#actions = [parser.OFPActionOutput(out_port, priority)]       
+       		#actions = [parser.OFPActionOutput(out_port, priority)]
+################## This ensures the packets are dropped from the ip prexit 10.0.0.0 assigned to IoT devices when there is no other matching rules in the trust list ###############################################################################################################       
         	inst = [parser.OFPInstructionActions(ofproto.OFPIT_CLEAR_ACTIONS, [])]
         	mod = parser.OFPFlowMod(datapath=datapath, command=ofproto.OFPFC_ADD, priority=priority, match=match, instructions=inst)
         	datapath.send_msg(mod)   
 	   
 
         # Send off the request to get current port descriptions
-        """req = parser.OFPPortDescStatsRequest(dp, 0)
-        dp.send_msg(req)
-
-        packet_in_mask = ofp.OFPR_ACTION | ofp.OFPR_INVALID_TTL
-        port_status_mask = ofp.OFPPR_ADD | ofp.OFPPR_DELETE | ofp.OFPPR_MODIFY
-        flow_removed_mask = 0
-        req = parser.OFPSetAsync(dp, [packet_in_mask, 0], [port_status_mask, 0],
-                                 [flow_removed_mask, 0])
-        dp.send_msg(req)"""
-
-        """msg = ev.msg
-        datapath = msg.datapath
-        ofproto = datapath.ofproto
-        datapath.id = msg.datapath_id
-        ofproto_parser = datapath.ofproto_parser
-
-        set_config = ofproto_parser.OFPSetConfig(
-            datapath,
-            datapath.ofproto.OFPC_FRAG_NORMAL,
-            datapath.ofproto.OFPCML_MAX,
-        )
-        datapath.send_msg(set_config)
-        self.install_table_miss(datapath, datapath.id)"""
+       
 
 
 
@@ -1491,19 +1254,6 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
             dpid_dst = str(int(link.dst.dpid)).strip()
             port_no_dst = str(int(link.dst.port_no)).strip()  
             hw_addr_dst = link.dst.hw_addr.strip()
-
-            #print "link_src,link_dst: ", link_src, link_dst
-
-            """print "dpid_src: ", dpid_src
-            print "port_no_src: ", port_no_src
-            print "hw_addr_src: ", hw_addr_src
-
-            print "dpid_dst: ", dpid_dst
-            print "port_no_dst: ", port_no_dst
-            print "hw_addr_dst: ", hw_addr_dst"""
-
-
-
             key = (link_src + "," + link_dst)
             key_rev = (link_dst + "," + link_src)
             #print "key, key_rev: ", key, key_rev
@@ -1536,23 +1286,4 @@ class SimpleSwitchIgmp13(app_manager.RyuApp):
                 #strs[13] = s1[0:2]+":"+s1[2:4]+":"+s1[4:6]+":"+s1[6:8]+":"+s1[8:10]+":"+s1[10:12]--------------
 
                 switch_links[key] = strs
-                #print(strs)
-                #v = v+1
-                #switch_links[key].append(strs)
-                #print(switch_links[key])   
-        #print switch_links   
-        #self.monitor_thread = hub.spawn(self._monitor)
-        #self.net.add_edges_from(links)
-        #links=[(link.dst.dpid,link.src.dpid,{'port':link.dst.port_no}) for link in links_list]
-        #print "links2: ",links
-        #self.net.add_edges_from(links)
-        #print "**********List of links"
-        #print self.net.edges()
 
-
-
-
-
-#app_manager.require_app('ryu.app.rest_topology')
-#app_manager.require_app('ryu.app.ws_topology')
-#app_manager.require_app('ryu.app.ofctl_rest')
